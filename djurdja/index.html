@@ -1,0 +1,566 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Весь, вся, всё, все</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Literata:wght@400;600&display=swap">
+<style>
+  /* Layout: one reading column, a sticky progress band, three sections of ruled sentence rows with inline blanks. */
+  :root {
+    --bg: #f5f6fa;
+    --surface: #ffffff;
+    --fg: #1a1e2e;
+    --muted: #666d85;
+    --hint: #8a91a8;
+    --line: #dcdfe9;
+    --accent: #24408e;
+    --accent-soft: #e8ecf8;
+    --on-accent: #ffffff;
+    --good: #17754a;
+    --good-bg: #e1f3e9;
+    --bad: #b3261e;
+    --bad-bg: #fbe8e6;
+    --font-text: "Literata", Georgia, "Times New Roman", serif;
+    --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12151f;
+      --surface: #1a1e2c;
+      --fg: #e9ebf3;
+      --muted: #9aa2ba;
+      --hint: #7b839f;
+      --line: #2b3147;
+      --accent: #9db0ff;
+      --accent-soft: #222a45;
+      --on-accent: #10141f;
+      --good: #6fd6a0;
+      --good-bg: #16342a;
+      --bad: #ff9a92;
+      --bad-bg: #3b1f22;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12151f;
+    --surface: #1a1e2c;
+    --fg: #e9ebf3;
+    --muted: #9aa2ba;
+    --hint: #7b839f;
+    --line: #2b3147;
+    --accent: #9db0ff;
+    --accent-soft: #222a45;
+    --on-accent: #10141f;
+    --good: #6fd6a0;
+    --good-bg: #16342a;
+    --bad: #ff9a92;
+    --bad-bg: #3b1f22;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    z-index: 10;
+    background: var(--bg);
+  }
+  .wrap {
+    width: 100%;
+    max-width: 46rem;
+    margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+
+  /* Header */
+  .head .wrap { padding-block: 2.2rem 1.4rem; }
+  .eyebrow {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  h1 {
+    margin: 0.35rem 0 0;
+    font-family: var(--font-text);
+    font-weight: 600;
+    font-size: clamp(2rem, 7vw, 3rem);
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+  .sub {
+    margin: 0.4rem 0 0;
+    font-family: var(--font-text);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--muted);
+  }
+  .note {
+    margin: 1.1rem 0 0;
+    max-width: 60ch;
+    color: var(--muted);
+  }
+
+  /* Sticky progress */
+  .bar {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 5;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .barin {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding-block: 0.65rem;
+  }
+  .count {
+    min-width: 4.6ch;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .track {
+    flex: 1;
+    min-width: 0;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .fill {
+    width: 0;
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.3s ease, background-color 0.3s ease;
+  }
+  .fill.done { background: var(--good); }
+
+  /* Sections */
+  .sec { margin-top: 2.4rem; }
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin: 0;
+    font-family: var(--font-text);
+    font-weight: 600;
+    font-size: 1.3rem;
+    line-height: 1.3;
+  }
+  .num {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .intro { margin: 0.45rem 0 0.9rem; color: var(--muted); }
+
+  ol.list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr) 1.6rem;
+    column-gap: 0.5rem;
+    align-items: baseline;
+    padding-block: 0.6rem;
+    border-top: 1px solid var(--line);
+  }
+  .no {
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .sent {
+    min-width: 0;
+    font-family: var(--font-text);
+    font-size: 1.2rem;
+    line-height: 2.15;
+  }
+  .mark {
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .mark.ok { color: var(--good); }
+  .mark.bad { color: var(--bad); }
+  .msg {
+    grid-column: 2 / 4;
+    margin: -0.25rem 0 0.1rem;
+    font-size: 0.85rem;
+    color: var(--bad);
+  }
+
+  /* Blanks */
+  .bw { white-space: nowrap; }
+  .blank {
+    font: inherit;
+    font-size: 1.02em;
+    color: var(--fg);
+    background: var(--accent-soft);
+    border: 0;
+    border-bottom: 2px solid var(--accent);
+    border-radius: 5px 5px 0 0;
+    padding: 0.12em 0.4em;
+    margin: 0 0.1em;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  input.blank { text-align: center; }
+  select.blank { cursor: pointer; padding-right: 0.2em; }
+  select.blank option { color: var(--fg); background: var(--surface); }
+  .blank.ok { background: var(--good-bg); border-bottom-color: var(--good); color: var(--good); }
+  .blank.bad { background: var(--bad-bg); border-bottom-color: var(--bad); color: var(--bad); }
+  .blank:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .hint {
+    margin-left: 0.3em;
+    font-size: 0.85em;
+    color: var(--hint);
+  }
+
+  /* Footer */
+  .foot { padding-block: 2rem 3.5rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .btn {
+    font-family: var(--font-ui);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.65rem 1.1rem;
+    border-radius: 6px;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+  }
+  .btn.primary { background: var(--accent); color: var(--on-accent); }
+  .summary {
+    margin: 1.2rem 0 0;
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    background: var(--accent-soft);
+  }
+  .summary.good { background: var(--good-bg); color: var(--good); font-weight: 600; }
+
+  @media (max-width: 480px) {
+    .sent { font-size: 1.1rem; }
+    .row { grid-template-columns: 1.7rem minmax(0, 1fr) 1.4rem; column-gap: 0.35rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; }
+  }
+</style>
+
+<header class="head">
+  <div class="wrap">
+    <p class="eyebrow">Domaći zadatak</p>
+    <h1 lang="ru">весь, вся, всё, все</h1>
+    <p class="sub">promena po padežima</p>
+    <p class="note">Odgovori se proveravaju automatski, a netačan odgovor možete ispraviti koliko god puta želite. Pazite na slovo ё: <span lang="ru">все</span> i <span lang="ru">всё</span> nisu isto.</p>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="wrap barin">
+    <span class="count"><span id="okc">0</span> / <span id="tot">0</span></span>
+    <div class="track" id="track" role="progressbar" aria-label="Tačni odgovori" aria-valuemin="0" aria-valuenow="0"><div class="fill" id="fill"></div></div>
+  </div>
+</div>
+
+<main class="wrap" id="main"></main>
+
+<div class="wrap foot">
+  <div class="actions">
+    <button class="btn primary" id="checkAll" type="button">Proveri sve</button>
+    <button class="btn" id="reset" type="button">Počni ispočetka</button>
+  </div>
+  <p class="summary" id="summary" role="status" hidden></p>
+</div>
+
+<script>
+(function () {
+  var TASKS = [
+    {
+      title: "Izaberite pravilan oblik",
+      intro: "Izaberite odgovarajući oblik zamenice.",
+      type: "select",
+      items: [
+        { t: "Я работаю {} день.", a: ["весь"], o: ["весь", "всю", "всем"] },
+        { t: "Она прочитала {} книгу.", a: ["всю"], o: ["весь", "всю", "все"] },
+        { t: "Мы говорили обо {}.", a: ["всём"], o: ["всё", "всём", "всем"] },
+        { t: "{} мои друзья живут в Белграде.", a: ["Все"], o: ["Весь", "Вся", "Все"] },
+        { t: "Я пригласил {} семью на праздник.", a: ["всю"], o: ["всю", "весь", "всем"] },
+        { t: "Он занимается спортом {} неделю.", a: ["всю"], o: ["всю", "все", "всей"] },
+        { t: "Я доволен {} результатами.", a: ["всеми"], o: ["все", "всеми", "всех"] }
+      ]
+    },
+    {
+      title: "Promenite oblik zamenice",
+      intro: "Upišite pravilan oblik zamenice koja je data u zagradi.",
+      type: "input",
+      items: [
+        { t: "Я учусь в университете {} день.", a: ["весь"], h: "весь" },
+        { t: "Мы гуляли по городу {} ночь.", a: ["всю"], h: "вся" },
+        { t: "Она рассказала мне обо {} друзьях.", a: ["всех"], h: "все" },
+        { t: "Я хочу познакомиться со {} твоей семьёй.", a: ["всей"], h: "вся" },
+        { t: "Он не знает {} слов в этом тексте.", a: ["всех"], h: "все" },
+        { t: "Я отправил фотографии {} друзьям.", a: ["всем"], h: "все" },
+        { t: "Мы были дома {} воскресенье.", a: ["всё"], h: "всё" }
+      ]
+    },
+    {
+      title: "Dopunite rečenice odgovarajućim oblikom zamenice",
+      intro: "Upišite odgovarajući oblik zamenice весь, вся, всё ili все. Obratite pažnju na smisao rečenice i padež.",
+      type: "input",
+      items: [
+        { t: "Моя сестра любит путешествовать. Она хочет увидеть {} страны Европы.", a: ["все"] },
+        { t: "У меня был отпуск, я встретился со {} друзьями.", a: ["всеми"] },
+        { t: "Я не могу найти ключи. Я уже посмотрел во {} комнатах.", a: ["всех"] },
+        { t: "Мой брат очень занят: он работает {} утро и {} вечер.", a: ["всё", "весь"] },
+        { t: "Мы пригласили гостей, но не {} смогли прийти.", a: ["все"] },
+        { t: "Я знаю {} его друзей, но не знаю его семью.", a: ["всех"] },
+        { t: "На столе лежали книги, тетради и ручки. {} это было очень нужно для учёбы.", a: ["всё"] }
+      ]
+    }
+  ];
+
+  var KEY = "vsyo-worksheet-v1";
+  var main = document.getElementById("main");
+  var okc = document.getElementById("okc");
+  var tot = document.getElementById("tot");
+  var fill = document.getElementById("fill");
+  var track = document.getElementById("track");
+  var summary = document.getElementById("summary");
+  var blanks = [];
+  var items = [];
+  var pressed = false;
+
+  function el(tag, cls, txt) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt != null) e.textContent = txt;
+    return e;
+  }
+  function norm(s) { return s.trim().replace(/\s+/g, " ").toLowerCase(); }
+  function noYo(s) { return s.replace(/ё/g, "е"); }
+
+  /* mode: false = typing, true = commit (blur, Enter, select change), "all" = check everything */
+  function judge(b, mode) {
+    var v = norm(b.ctl.value);
+    var want = norm(b.ans);
+    b.yo = false;
+    if (!v) { b.status = mode === "all" ? "empty" : ""; return; }
+    if (v === want) { b.status = "ok"; return; }
+    if (mode) { b.status = "bad"; b.yo = noYo(v) === noYo(want); }
+    else { b.status = ""; }
+  }
+
+  function refresh(item) {
+    var bad = false, empty = false, yo = false, all = true;
+    item.blanks.forEach(function (b) {
+      var isBad = b.status === "bad";
+      var isEmpty = b.status === "empty";
+      b.ctl.classList.toggle("ok", b.status === "ok");
+      b.ctl.classList.toggle("bad", isBad || isEmpty);
+      if (isBad || isEmpty) b.ctl.setAttribute("aria-invalid", "true");
+      else b.ctl.removeAttribute("aria-invalid");
+      if (b.status !== "ok") all = false;
+      if (isBad) { bad = true; if (b.yo) yo = true; }
+      if (isEmpty) empty = true;
+    });
+    var wrong = bad || empty;
+    item.mark.className = "mark" + (all ? " ok" : wrong ? " bad" : "");
+    item.mark.textContent = all ? "✓" : wrong ? "✗" : "";
+    if (all) item.mark.setAttribute("aria-label", "tačno");
+    else if (wrong) item.mark.setAttribute("aria-label", "netačno");
+    else item.mark.removeAttribute("aria-label");
+    var m = "";
+    if (bad) m = yo ? "Proverite slovo: ё i е nisu isto." : "Nije tačno. Pokušajte ponovo.";
+    else if (empty) m = "Popunite polje.";
+    item.msg.textContent = m;
+    item.msg.hidden = !m;
+  }
+
+  function updateTotals() {
+    var total = blanks.length;
+    var ok = blanks.filter(function (b) { return b.status === "ok"; }).length;
+    okc.textContent = ok;
+    fill.style.width = (total ? ok / total * 100 : 0) + "%";
+    fill.classList.toggle("done", ok === total && total > 0);
+    track.setAttribute("aria-valuenow", ok);
+    if (ok === total && total > 0) {
+      summary.hidden = false;
+      summary.className = "summary good";
+      summary.textContent = "Odlično! Svih " + total + " odgovora je tačno.";
+    } else if (pressed) {
+      summary.hidden = false;
+      summary.className = "summary";
+      summary.textContent = "Tačno: " + ok + " od " + total + ". Ispravite označena polja.";
+    } else {
+      summary.hidden = true;
+    }
+  }
+
+  function save() {
+    try {
+      var o = {};
+      blanks.forEach(function (b) { o[b.id] = b.ctl.value; });
+      localStorage.setItem(KEY, JSON.stringify(o));
+    } catch (e) {}
+  }
+
+  function onChange(b, mode) {
+    pressed = false;
+    judge(b, mode);
+    refresh(b.item);
+    updateTotals();
+    save();
+  }
+
+  function makeBlank(task, it, item, ti, ii, j) {
+    var ans = it.a[j];
+    var box = el("span", "bw");
+    var ctl;
+    if (task.type === "select") {
+      ctl = document.createElement("select");
+      ctl.add(new Option("…", ""));
+      it.o.forEach(function (o) { ctl.add(new Option(o, o)); });
+    } else {
+      ctl = document.createElement("input");
+      ctl.type = "text";
+      ctl.autocomplete = "off";
+      ctl.autocapitalize = "off";
+      ctl.spellcheck = false;
+      ctl.setAttribute("enterkeyhint", "next");
+      ctl.style.width = (Math.max(ans.length, 4) + 3) + "ch";
+    }
+    ctl.className = "blank";
+    var id = ti + "-" + ii + "-" + j;
+    ctl.id = "b-" + id;
+    ctl.setAttribute("aria-label", "Zadatak " + (ti + 1) + "." + (ii + 1) + (it.a.length > 1 ? ", polje " + (j + 1) : ""));
+    box.appendChild(ctl);
+    if (task.type === "input" && it.h) box.appendChild(el("span", "hint", "(" + it.h + ")"));
+
+    var b = { id: id, ctl: ctl, ans: ans, item: item, status: "", yo: false, box: box };
+    if (task.type === "select") {
+      ctl.addEventListener("change", function () { onChange(b, true); });
+    } else {
+      ctl.addEventListener("input", function () { onChange(b, false); });
+      ctl.addEventListener("blur", function () { onChange(b, true); });
+      ctl.addEventListener("keydown", function (e) {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+        onChange(b, true);
+        if (b.status === "ok") {
+          var nx = blanks[blanks.indexOf(b) + 1];
+          if (nx) nx.ctl.focus();
+        } else {
+          ctl.select();
+        }
+      });
+    }
+    item.blanks.push(b);
+    blanks.push(b);
+    return box;
+  }
+
+  TASKS.forEach(function (task, ti) {
+    var sec = el("section", "sec");
+    var h = el("h2");
+    h.appendChild(el("span", "num", String(ti + 1)));
+    h.appendChild(document.createTextNode(task.title));
+    sec.appendChild(h);
+    sec.appendChild(el("p", "intro", task.intro));
+    var ol = el("ol", "list");
+    task.items.forEach(function (it, ii) {
+      var li = el("li", "row");
+      var item = { blanks: [], mark: el("span", "mark"), msg: el("div", "msg") };
+      item.msg.hidden = true;
+      var sent = el("div", "sent");
+      sent.lang = "ru";
+      var parts = it.t.split("{}");
+      parts.forEach(function (p, j) {
+        if (p) sent.appendChild(document.createTextNode(p));
+        if (j < parts.length - 1) sent.appendChild(makeBlank(task, it, item, ti, ii, j));
+      });
+      li.appendChild(el("span", "no", (ii + 1) + "."));
+      li.appendChild(sent);
+      li.appendChild(item.mark);
+      li.appendChild(item.msg);
+      items.push(item);
+      ol.appendChild(li);
+    });
+    sec.appendChild(ol);
+    main.appendChild(sec);
+  });
+
+  tot.textContent = blanks.length;
+  track.setAttribute("aria-valuemax", blanks.length);
+
+  document.getElementById("checkAll").addEventListener("click", function () {
+    pressed = true;
+    blanks.forEach(function (b) { judge(b, "all"); });
+    items.forEach(refresh);
+    updateTotals();
+  });
+
+  var resetBtn = document.getElementById("reset");
+  var armed = false, timer = null;
+  function disarm() {
+    armed = false;
+    clearTimeout(timer);
+    resetBtn.textContent = "Počni ispočetka";
+  }
+  resetBtn.addEventListener("click", function () {
+    if (!armed) {
+      armed = true;
+      resetBtn.textContent = "Sigurno? Kliknite ponovo";
+      timer = setTimeout(disarm, 3500);
+      return;
+    }
+    disarm();
+    blanks.forEach(function (b) { b.ctl.value = ""; b.status = ""; b.yo = false; });
+    items.forEach(refresh);
+    pressed = false;
+    save();
+    updateTotals();
+  });
+
+  /* Restore saved answers (per-viewer convenience, safe if storage is unavailable) */
+  try {
+    var saved = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (saved) {
+      blanks.forEach(function (b) {
+        if (typeof saved[b.id] === "string") b.ctl.value = saved[b.id];
+      });
+    }
+  } catch (e) {}
+  blanks.forEach(function (b) { judge(b, true); });
+  items.forEach(refresh);
+  updateTotals();
+})();
+</script>
+
+</body></html>
